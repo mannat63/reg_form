@@ -352,7 +352,7 @@ function Hero() {
   );
 }
 
-function Programme() {
+function Programme({ showCta = true }) {
   return (
     <section className="section-wrap" id="programme">
       <div className="section-topline">
@@ -415,16 +415,18 @@ function Programme() {
         </div>
       </div>
 
-      <div className="programme-cta">
-        <div>
-          <span className="mini-label">READY TO BEGIN?</span>
-          <h3>Build your ERP skill set.</h3>
-        </div>
+      {showCta && (
+        <div className="programme-cta">
+          <div>
+            <span className="mini-label">READY TO BEGIN?</span>
+            <h3>Build your ERP skill set.</h3>
+          </div>
 
-        <a className="action-button" href="#registration">
-          Continue to registration <span className="button-arrow">↗</span>
-        </a>
-      </div>
+          <a className="action-button" href="#registration">
+            Continue to registration <span className="button-arrow">↗</span>
+          </a>
+        </div>
+      )}
     </section>
   );
 }
@@ -908,30 +910,6 @@ function Registration({ onSubmitted }) {
   );
 }
 
-function PathwayHeading() {
-  return (
-    <section className="section-wrap" id="programme">
-      <div className="section-title">
-        <div className="eyebrow">
-          <span className="eyebrow-line" />
-          YOUR PATHWAY
-        </div>
-
-        <h2>
-          Learn the system.
-          <br />
-          <span>Master the process.</span>
-        </h2>
-
-        <p>
-          Follow a structured learning journey from core ERP concepts to
-          specialisation and certification.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 function SuccessView({ data, onBack }) {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -1105,7 +1083,7 @@ export default function App() {
               data={registration}
               onBack={() => setRegistration(null)}
             />
-            <PathwayHeading />
+            <Programme showCta={false} />
             <Footer />
           </>
         ) : (
