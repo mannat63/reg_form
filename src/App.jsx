@@ -56,9 +56,9 @@ const STAGES = [
   },
 ];
 
-const MAJORS = ["Finance", "Marketing", "Operations", "HRM", "FB"];
+const MAJORS = ["Finance", "Marketing", "Operations", "HRM", "FB", "Others"];
 
-const MINORS = ["Finance", "Marketing", "Operations", "D&A"];
+const MINORS = ["Finance", "Marketing", "Operations", "D&A", "Others"];
 
 const SPECIALISATIONS = [
   {
@@ -81,7 +81,9 @@ const INITIAL_FORM = {
   email: "",
   phone: "",
   major: "",
+  majorOther: "",
   minor: "",
+  minorOther: "",
   domain: "",
   consent: false,
 };
@@ -305,16 +307,6 @@ function Hero() {
             take the next step towards ERP proficiency.
           </p>
 
-          <div className="hero-buttons">
-            <a className="action-button" href="#programme">
-              Explore the programme <span className="button-arrow">↗</span>
-            </a>
-
-            <a className="action-button action-secondary" href="#registration">
-              Register now <span className="button-arrow">↗</span>
-            </a>
-          </div>
-
           <div className="hero-metrics">
             <div>
               <strong>
@@ -502,10 +494,14 @@ function Registration({ onSubmitted }) {
 
     if (!form.major) {
       nextErrors.major = "Please select your major specialisation.";
+    } else if (form.major === "Others" && !form.majorOther.trim()) {
+      nextErrors.majorOther = "Please enter your major specialisation.";
     }
 
     if (!form.minor) {
       nextErrors.minor = "Please select your minor specialisation.";
+    } else if (form.minor === "Others" && !form.minorOther.trim()) {
+      nextErrors.minorOther = "Please enter your minor specialisation.";
     }
 
     if (isOperations && form.domain !== "ESM") {
@@ -550,14 +546,19 @@ function Registration({ onSubmitted }) {
     setSubmitError("");
     setSubmitting(true);
 
+    const majorValue =
+      form.major === "Others" ? form.majorOther.trim() : form.major;
+    const minorValue =
+      form.minor === "Others" ? form.minorOther.trim() : form.minor;
+
     const payload = {
       token: SHEETS_TOKEN || "",
       fullName: form.fullName.trim(),
       rollNumber: form.rollNumber.trim(),
       email: form.email.trim(),
       phone: form.phone.trim(),
-      major: form.major,
-      minor: form.minor,
+      major: majorValue,
+      minor: minorValue,
       domain: form.domain,
       consent: form.consent,
     };
@@ -579,8 +580,8 @@ function Registration({ onSubmitted }) {
 
       onSubmitted({
         fullName: form.fullName.trim(),
-        major: form.major,
-        minor: form.minor,
+        major: majorValue,
+        minor: minorValue,
         domain: form.domain,
       });
     } catch {
@@ -751,7 +752,9 @@ function Registration({ onSubmitted }) {
                 required
                 aria-invalid={Boolean(errors.major)}
               >
-                <option value="">Select your major</option>
+                <option value="">
+                  Select your major as per approved resume
+                </option>
                 {MAJORS.map((major) => (
                   <option key={major} value={major}>
                     {major}
@@ -760,6 +763,24 @@ function Registration({ onSubmitted }) {
               </select>
 
               {errors.major && <p className="field-error">{errors.major}</p>}
+
+              {form.major === "Others" && (
+                <>
+                  <input
+                    id="majorOther"
+                    name="majorOther"
+                    value={form.majorOther}
+                    onChange={updateField}
+                    placeholder="Enter your major specialisation"
+                    autoComplete="off"
+                    required
+                    aria-invalid={Boolean(errors.majorOther)}
+                  />
+                  {errors.majorOther && (
+                    <p className="field-error">{errors.majorOther}</p>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="field">
@@ -775,7 +796,9 @@ function Registration({ onSubmitted }) {
                 required
                 aria-invalid={Boolean(errors.minor)}
               >
-                <option value="">Select your minor</option>
+                <option value="">
+                  Select your minor as per approved resume
+                </option>
                 {MINORS.map((minor) => (
                   <option key={minor} value={minor}>
                     {minor}
@@ -784,6 +807,24 @@ function Registration({ onSubmitted }) {
               </select>
 
               {errors.minor && <p className="field-error">{errors.minor}</p>}
+
+              {form.minor === "Others" && (
+                <>
+                  <input
+                    id="minorOther"
+                    name="minorOther"
+                    value={form.minorOther}
+                    onChange={updateField}
+                    placeholder="Enter your minor specialisation"
+                    autoComplete="off"
+                    required
+                    aria-invalid={Boolean(errors.minorOther)}
+                  />
+                  {errors.minorOther && (
+                    <p className="field-error">{errors.minorOther}</p>
+                  )}
+                </>
+              )}
             </div>
           </div>
 
