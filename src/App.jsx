@@ -422,6 +422,63 @@ function Programme({ showCta = true }) {
 const SHEETS_URL = import.meta.env.VITE_SHEETS_URL;
 const SHEETS_TOKEN = import.meta.env.VITE_SHEETS_TOKEN;
 
+const INSTAGRAM_URL = "https://www.instagram.com/optimus.imnu";
+
+function InstagramGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <rect
+        x="2.5"
+        y="2.5"
+        width="19"
+        height="19"
+        rx="5.5"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <circle
+        cx="12"
+        cy="12"
+        r="4.3"
+        stroke="currentColor"
+        strokeWidth="1.8"
+      />
+      <circle cx="17.3" cy="6.7" r="1.3" fill="currentColor" />
+    </svg>
+  );
+}
+
+function InstaFollow() {
+  return (
+    <div className="insta-card">
+      <span className="insta-badge">
+        <InstagramGlyph />
+      </span>
+
+      <div className="insta-copy">
+        <span className="insta-eyebrow">✦ ONE LAST THING</span>
+        <h3>Have you followed us on Instagram yet?</h3>
+        <p>
+          Follow <strong>@optimus.imnu</strong> before locking in your
+          registration — your engagement is considered during participant
+          finalisation.
+        </p>
+      </div>
+
+      <a
+        className="insta-link"
+        href={INSTAGRAM_URL}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <InstagramGlyph />
+        @optimus.imnu
+        <span className="insta-arrow">↗</span>
+      </a>
+    </div>
+  );
+}
+
 function Registration({ onSubmitted }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
@@ -927,6 +984,8 @@ function Registration({ onSubmitted }) {
             <p className="field-error consent-error">{submitError}</p>
           )}
 
+          <InstaFollow />
+
           <div className="form-submit-row">
             <p>
               <span className="required-star">*</span> All fields are mandatory.
@@ -1004,6 +1063,8 @@ function SuccessView({ data, onBack }) {
             <strong>{data.domain}</strong>
           </div>
         </div>
+
+        <InstaFollow />
 
         <button type="button" className="action-button success-back" onClick={onBack}>
           <span className="button-arrow">↩</span> Back
