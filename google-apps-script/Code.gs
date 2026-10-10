@@ -40,6 +40,16 @@ function doPost(e) {
       return jsonOutput({ status: "error", message: "Unauthorized." });
     }
 
+    // Only accept official Nirma University email addresses. This is the
+    // server-side counterpart to the form's client-side validation, so a
+    // hand-crafted request cannot bypass it.
+    if (!isNirmaEmail(data.email)) {
+      return jsonOutput({
+        status: "error",
+        message: "A valid Nirma University email address is required.",
+      });
+    }
+
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
 
     if (sheet.getLastRow() === 0) {
@@ -66,6 +76,17 @@ function doPost(e) {
   } finally {
     lock.releaseLock();
   }
+}
+
+// Accept only official Nirma University email domains (same set the form
+// validates on the client).
+function isNirmaEmail(email) {
+  var value = String(email || "").trim();
+  return (
+    /^[^\s@]+@nirmauni\.ac\.in$/i.test(value) ||
+    /^[^\s@]+@nirma\.uni\.ac\.in$/i.test(value) ||
+    /^[^\s@]+@nirmauniversity\.ac\.in$/i.test(value)
+  );
 }
 
 // Simple health check so visiting the URL in a browser confirms it is live.

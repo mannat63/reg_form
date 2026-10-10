@@ -55,6 +55,18 @@ If you change `Code.gs`, you must re-deploy: **Deploy → Manage deployments →
 edit (pencil) → Version: New version → Deploy**. The `/exec` URL stays the
 same.
 
+## Restricting to Nirma University accounts
+
+Do **not** change "Who has access" to "Anyone within Nirmauni.ac.in" (or
+"Anyone with Google account"). Those settings force an interactive Google
+login that a background `fetch` from the website cannot perform, so form
+submissions would silently fail. Keep it on **Anyone**.
+
+Instead, access is limited at the application level: the form only accepts
+official Nirma email domains on the client, and `Code.gs` now **re-checks the
+email domain server-side** (`isNirmaEmail`) and rejects anything else — so a
+hand-crafted request without a Nirma email can't get in either.
+
 ## Notes & limitations
 
 - Env vars prefixed `VITE_` are embedded in the built JS and are **publicly
