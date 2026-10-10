@@ -282,10 +282,6 @@ function Hero() {
           <span className="status-dot" />
           IMNU · AHMEDABAD
         </div>
-
-        <a className="header-register" href="#registration">
-          REGISTER <span>↗</span>
-        </a>
       </header>
 
       <div className="hero-main">
