@@ -429,10 +429,15 @@ function Programme() {
   );
 }
 
+const SHEETS_URL = import.meta.env.VITE_SHEETS_URL;
+const SHEETS_TOKEN = import.meta.env.VITE_SHEETS_TOKEN;
+
 function Registration() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const isOperations = form.major === "Operations";
 
@@ -518,7 +523,7 @@ function Registration() {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (!validateForm()) {
@@ -532,15 +537,60 @@ function Registration() {
       return;
     }
 
-    // Frontend validation only. Connect a backend or form service
-    // before collecting or storing actual event registrations.
-    setSubmitted(true);
+    if (submitting) return;
+
+    if (!SHEETS_URL) {
+      setSubmitError(
+        "Registration endpoint is not configured. Please contact the coordinators."
+      );
+      return;
+    }
+
+    setSubmitError("");
+    setSubmitting(true);
+
+    const payload = {
+      token: SHEETS_TOKEN || "",
+      fullName: form.fullName.trim(),
+      rollNumber: form.rollNumber.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      major: form.major,
+      minor: form.minor,
+      domain: form.domain,
+      consent: form.consent,
+    };
+
+    try {
+      // text/plain avoids a CORS preflight, which Apps Script web apps
+      // do not handle. The script parses the raw JSON body.
+      const response = await fetch(SHEETS_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || result.status !== "success") {
+        throw new Error(result.message || "Submission failed.");
+      }
+
+      setSubmitted(true);
+    } catch {
+      setSubmitError(
+        "We couldn't submit your registration. Please check your connection and try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   function resetForm() {
     setForm(INITIAL_FORM);
     setErrors({});
     setSubmitted(false);
+    setSubmitError("");
   }
 
   return (
@@ -572,15 +622,15 @@ function Registration() {
         <div className="success-card" role="status">
           <div className="success-symbol">✓</div>
 
-          <div className="eyebrow">REGISTRATION DETAILS VALIDATED</div>
+          <div className="eyebrow">REGISTRATION RECEIVED</div>
 
           <h2>
             You're ready to <span>begin.</span>
           </h2>
 
           <p>
-            Your form passed the browser validation checks. No registration has
-            been sent or saved yet.
+            Your registration has been submitted and recorded. The programme
+            coordinators will be in touch with the next steps.
           </p>
 
           <div className="success-details">
@@ -879,13 +929,23 @@ function Registration() {
             <p className="field-error consent-error">{errors.consent}</p>
           )}
 
+          {submitError && (
+            <p className="field-error consent-error">{submitError}</p>
+          )}
+
           <div className="form-submit-row">
             <p>
               <span className="required-star">*</span> All fields are mandatory.
             </p>
 
-            <button className="action-button submit-button" type="submit">
-              Submit <span className="button-arrow">↗</span>
+            <button
+              className="action-button submit-button"
+              type="submit"
+              disabled={submitting}
+              aria-busy={submitting}
+            >
+              {submitting ? "Submitting…" : "Submit"}{" "}
+              <span className="button-arrow">↗</span>
             </button>
           </div>
         </form>
