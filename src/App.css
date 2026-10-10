@@ -1778,6 +1778,105 @@ select:focus-visible {
   font-size: 14px;
 }
 
+/* SUCCESS LAYOUT + ANIMATED TICK */
+
+.success-wrap {
+  padding-top: clamp(90px, 12vh, 150px);
+}
+
+.success-card {
+  animation: success-card-in 0.5s ease both;
+}
+
+@keyframes success-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.success-animation {
+  display: flex;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 22px;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-tick {
+  width: 100%;
+  height: 100%;
+  animation: tick-pop 0.35s ease-out 0.75s both;
+}
+
+.success-tick-circle {
+  stroke: var(--lime);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 208;
+  stroke-dashoffset: 208;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  animation: tick-circle 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.1s forwards;
+}
+
+.success-tick-check {
+  stroke: var(--lime);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: tick-check 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.65s forwards;
+}
+
+@keyframes tick-circle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tick-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tick-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.success-back {
+  margin-top: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .success-card,
+  .success-tick,
+  .success-tick-circle,
+  .success-tick-check {
+    animation: none;
+  }
+
+  .success-tick-circle,
+  .success-tick-check {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* FOOTER */
 
 .site-footer {

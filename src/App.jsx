@@ -432,10 +432,9 @@ function Programme() {
 const SHEETS_URL = import.meta.env.VITE_SHEETS_URL;
 const SHEETS_TOKEN = import.meta.env.VITE_SHEETS_TOKEN;
 
-function Registration() {
+function Registration({ onSubmitted }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
@@ -576,7 +575,12 @@ function Registration() {
         throw new Error(result.message || "Submission failed.");
       }
 
-      setSubmitted(true);
+      onSubmitted({
+        fullName: form.fullName.trim(),
+        major: form.major,
+        minor: form.minor,
+        domain: form.domain,
+      });
     } catch {
       setSubmitError(
         "We couldn't submit your registration. Please check your connection and try again."
@@ -584,13 +588,6 @@ function Registration() {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  function resetForm() {
-    setForm(INITIAL_FORM);
-    setErrors({});
-    setSubmitted(false);
-    setSubmitError("");
   }
 
   return (
@@ -618,49 +615,7 @@ function Registration() {
         </p>
       </div>
 
-      {submitted ? (
-        <div className="success-card" role="status">
-          <div className="success-symbol">✓</div>
-
-          <div className="eyebrow">REGISTRATION RECEIVED</div>
-
-          <h2>
-            You're ready to <span>begin.</span>
-          </h2>
-
-          <p>
-            Your registration has been submitted and recorded. The programme
-            coordinators will be in touch with the next steps.
-          </p>
-
-          <div className="success-details">
-            <div>
-              <small>STUDENT</small>
-              <strong>{form.fullName}</strong>
-            </div>
-
-            <div>
-              <small>MAJOR</small>
-              <strong>{form.major}</strong>
-            </div>
-
-            <div>
-              <small>MINOR</small>
-              <strong>{form.minor}</strong>
-            </div>
-
-            <div>
-              <small>ERP DOMAIN</small>
-              <strong>{form.domain}</strong>
-            </div>
-          </div>
-
-          <button type="button" className="action-button" onClick={resetForm}>
-            Edit details ↗
-          </button>
-        </div>
-      ) : (
-        <form className="registration-form" onSubmit={handleSubmit} noValidate>
+      <form className="registration-form" onSubmit={handleSubmit} noValidate>
           <div className="form-section-heading">
             <span>01</span>
             <div>
@@ -949,7 +904,96 @@ function Registration() {
             </button>
           </div>
         </form>
-      )}
+    </section>
+  );
+}
+
+function PathwayHeading() {
+  return (
+    <section className="section-wrap" id="programme">
+      <div className="section-title">
+        <div className="eyebrow">
+          <span className="eyebrow-line" />
+          YOUR PATHWAY
+        </div>
+
+        <h2>
+          Learn the system.
+          <br />
+          <span>Master the process.</span>
+        </h2>
+
+        <p>
+          Follow a structured learning journey from core ERP concepts to
+          specialisation and certification.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function SuccessView({ data, onBack }) {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
+  return (
+    <section className="section-wrap success-wrap" id="registration">
+      <div className="success-card" role="status">
+        <div className="success-animation" aria-hidden="true">
+          <svg className="success-tick" viewBox="0 0 72 72">
+            <circle
+              className="success-tick-circle"
+              cx="36"
+              cy="36"
+              r="33"
+              fill="none"
+            />
+            <path
+              className="success-tick-check"
+              fill="none"
+              d="M22 37.5 L32.5 48 L51 27"
+            />
+          </svg>
+        </div>
+
+        <div className="eyebrow">REGISTRATION RECEIVED</div>
+
+        <h2>
+          You're ready to <span>begin.</span>
+        </h2>
+
+        <p>
+          Your registration has been submitted and recorded. The programme
+          coordinators will be in touch with the next steps.
+        </p>
+
+        <div className="success-details">
+          <div>
+            <small>STUDENT</small>
+            <strong>{data.fullName}</strong>
+          </div>
+
+          <div>
+            <small>MAJOR</small>
+            <strong>{data.major}</strong>
+          </div>
+
+          <div>
+            <small>MINOR</small>
+            <strong>{data.minor}</strong>
+          </div>
+
+          <div>
+            <small>ERP DOMAIN</small>
+            <strong>{data.domain}</strong>
+          </div>
+        </div>
+
+        <button type="button" className="action-button success-back" onClick={onBack}>
+          <span className="button-arrow">↩</span> Back
+        </button>
+      </div>
     </section>
   );
 }
@@ -1032,6 +1076,7 @@ function Footer() {
 
 export default function App() {
   const [introState, setIntroState] = useState("visible");
+  const [registration, setRegistration] = useState(null);
 
   const startExit = useCallback(() => {
     setIntroState("exiting");
@@ -1054,10 +1099,23 @@ export default function App() {
           introState === "visible" ? "main-site-hidden" : "main-site-visible"
         }`}
       >
-        <Hero />
-        <Programme />
-        <Registration />
-        <Footer />
+        {registration ? (
+          <>
+            <SuccessView
+              data={registration}
+              onBack={() => setRegistration(null)}
+            />
+            <PathwayHeading />
+            <Footer />
+          </>
+        ) : (
+          <>
+            <Hero />
+            <Programme />
+            <Registration onSubmitted={setRegistration} />
+            <Footer />
+          </>
+        )}
       </main>
     </div>
   );
